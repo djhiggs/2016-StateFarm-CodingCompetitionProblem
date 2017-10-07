@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.statefarm.codingcomp.bean.Address;
 import com.statefarm.codingcomp.bean.Agent;
 import com.statefarm.codingcomp.bean.Office;
+import com.statefarm.codingcomp.bean.Product;
 import com.statefarm.codingcomp.utilities.SFFileReader;
 
 @Component
@@ -28,9 +29,8 @@ public class AgentParser {
 
 	@Cacheable(value = "agents")
 	public Agent parseAgent(String fileName) {
+		Agent agent = new Agent();
 		try {
-			Agent agent = new Agent();
-			
 			Office office1 = new Office();
 			Office office2 = new Office();
 			Set<String> languages1 = new HashSet<String>();
@@ -40,23 +40,49 @@ public class AgentParser {
 			Address address1 = new Address();
 			Address address2 = new Address();
 			
-			File theHtmlPage = new File(Paths.get("src", "test", "resources", "KevinParks.html").toString());
+			File theHtmlPage = new File(fileName);
+			System.out.println(fileName);
 			Document theAgent = Jsoup.parse(theHtmlPage, "UTF-8", "");
+			//System.out.println(theAgent);
 			// Grab mainOffice
-			Elements offices = theAgent.select("#tabGroupOffice");
-			
-			String mainOfficeTitle = offices.select("#tabmainLocation").text();
-			String secondOfficetTitle = offices.select("#tabadditionalLoc_0").text();
-			
-			String mainofficeLanguage1 = offices.select("#languageEnglish_mainLocContent").text();
-			String mainofficeLanguage2 = offices.select("#languageSpanish_mainLocContent_0").text();
-			languages1.add(mainofficeLanguage1);
-			
+//			Elements offices = theAgent.select("#tabGroupOffice");
+//			
+//			String mainOfficeTitle = offices.select("#tabmainLocation").text();
+//			String secondOfficetTitle = offices.select("#tabadditionalLoc_0").text();
+//			
+//			String mainofficeLanguage1 = offices.select("#languageEnglish_mainLocContent").text();
+//			String mainofficeLanguage2 = offices.select("#languageSpanish_mainLocContent_0").text();
+//			
+//			String secondOfficeLanguage1 = offices.select("#languageEnglish_additionalLocContent_0").text();
+//			String secondOfficeLanguage2 = offices.select("#languageSpanish_additionalLocContent_0_0").text();
+//			
+//			
+//			languages1.add(mainofficeLanguage1);
+//			languages1.add(mainofficeLanguage2);
+//			languages2.add(secondOfficeLanguage1);
+//			languages2.add(secondOfficeLanguage2);
+//			
+//			String mainOfficeLine1 = offices.select("#locStreetContent_mainLocContent").text();
+//			
+//			Elements mainOfficeCity = offices.select("span[itemprop=addressLocality]:lt(1)");
+//			// Diagnostic code
+//			Elements mainCity = mainOfficeCity.get(0).select("span[itemprop=addressLocality]:lt(1)");
+//			String secondCity = mainOfficeCity.get(1).outerHtml();
+
+			// Parsing Products
+			// aria-label=Products Offered/Serviced by this Agent
+			Elements productsDivLi = theAgent.select("div[aria-label='Products Offered/Serviced by this Agent'] li");
+			Set<Product> products = new HashSet<Product>();
+			for(Element li : productsDivLi) {
+				//System.out.println(li.text());
+				products.add(Product.fromValue(li.text()));
+			}
+			agent.setProducts(products);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return agent;
 	}
 }

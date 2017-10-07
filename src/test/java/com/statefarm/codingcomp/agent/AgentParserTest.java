@@ -49,6 +49,7 @@ public class AgentParserTest {
 		
 		expectedAgent1 = createExpectedAgent1();
 		actualAgent1 = agentParser.parseAgent(kevinParksWebsitePath);
+		//actualAgent1 = null;
 		
 		expectedAgent2 = createExpectedAgent2();
 		actualAgent2 = agentParser.parseAgent(debbiePeckWebsitePath);
